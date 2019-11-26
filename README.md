@@ -1,4 +1,4 @@
-# APP ChileQuiere
+# APP ChileCuenta
 
 ## Requirments: 
 - docker 
