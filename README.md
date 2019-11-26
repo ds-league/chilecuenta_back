@@ -1,1 +1,5 @@
-# chilequiere
+# APP ChileCuenta
+
+## Requirments: 
+- docker 
+- docker-compose
