@@ -7,7 +7,7 @@
 ## First execution instructions
 1. Clone the repository: ```git clone https://github.com/ds-league/chilecuenta.git```
 2. Enter the root folder: ```cd chilecuenta```
-3. Build the docker image ```docker build .```
+3. Build the docker image: ```docker build .```
 4. Create an image by using docker-compose especifications: ```docker-compose build```
 
 ## Run commands 
