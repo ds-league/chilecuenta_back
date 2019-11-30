@@ -14,4 +14,5 @@
 - create the app (this is not necessary because we already have the application created): ```docker-compose run app sh -c "django-admin.py startproject app ."```
 - The commands can be executed (inside the container) by using: ```docker-compose run app sh -c "your python command here"```
   - e.g., ```docker-compose run app sh -c "python manage.py test"```: It runs the testing cases
+  - e.g., ```docker-compose run app sh -c "python manage.py makemigrations core"```: run and create migrations
 - up the app: ```docker-compose up```
