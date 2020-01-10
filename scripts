@@ -1,0 +1,125 @@
+import pandas as pd
+import numpy as np
+import os
+path = os.getcwd()
+#path = "/home/mia/Downloads/chile_cuenta/"
+
+""" PRIMERO: Grafico uno - encontrar familia parecida para
+ubicar usuarios en nuestro grafico"""
+
+def busca_familia_similar(ingreso_pc_y,ingreso_pc):
+    """ Buscamos una familia similar, solamente basado en el ingreso per capita
+    (ingreso total de la familia dividido por numero de miembros)
+
+        -ingreso_pc_y = ingreso per capita de familia usuaria
+        -path_table_sorted = el csv sorteado con ingresos y gastos
+
+        TO DO: ingreso per capita más altos que en la encuesta
+    """
+
+    for i in range(ingreso_pc.shape[0]):
+        if ingreso_pc_y > ingreso_pc[i] and ingreso_pc_y <= ingreso_pc[i+1]:
+            ingreso_pc_x = i + 1
+            break
+
+    return ingreso_pc_x
+
+""" SEGUNDO : INGRESO MINIMO GARANTIZADO - UNA SIMULACION
+264 luca al mes era el sueldo minimo no liquido (bruto) en 2017 (enero hasta julio)
+    https://www.calcular.cl/sueldo-minimo-chile.html
+Informe de Dic/3 https://www.camara.cl/pley/pley_detalle.aspx?prmID=13581&prmBoletin=13041-13, Dic 11:
+Art. 1
+Tendrán derecho al subsidio, aquellos trabajadores dependientes:
+señalados en el inciso anterior que cumplan con los siguientes requisitos:
+a) Percibir una remuneración BRUTA mensual inferior a $384.363; y
+b) Integrar un hogar perteneciente a los primeros nueve deciles,
+de acuerdo al instrumento de caracterización socioeconómica a que se refiere el artículo 5º de la ley Nº 20.379.
+
+Art. 3
+cuya jornada ordinaria de trabajo sea inferior al máximo semanal establecido en el inciso primero del artículo 22 del Código del Trabajo
+y superior a 30 horas semanales
+
+Art. 2
+Para aquellos trabajadores dependientes señalados en el artículo 1°,
+cuya remuneración bruta mensual sea igual o superior a $301.000 e inferior a $384.363,
+y su jornada ordinaria de trabajo sea el máximo de horas a que se refiere el inciso primero del artículo 22 del Código del Trabajo,
+el monto mensual del subsidio será equivalente a la cantidad que resulte de restar al aporte máximo el valor afecto a subsidio.
+Para efectos de este artículo se entenderá por:
+a.- Aporte máximo: $59.200.
+b.- Valor afecto a subsidio: corresponde al 71,01% de la diferencia entre la REMUNERACION BRUTA mensual y $301.000.
+c.- Remuneración bruta mensual: aquella definida en el artículo 41 del Código del Trabajo.
+
+INGA = ingreso bruto asalariado
+def: Corresponde al ingreso por trabajo sin contemplar los descuentos legales
+(previsión, salud e impuesto de segunda categoría),así como tampoco los descuentos no legales.
+Los ingresos relacionados con el empleo asalariado se componen de todos los pagos,
+prestaciones en metálico, especie o servicios devengados en el mes anterior al levantamiento de la encuesta y que no se encuentran imputados.
+
+TO DO: hacer todo con INGA_HD”
+”"""
+def subvencion_porcentaje(subvencionados,sueldo_min, ingreso_min):
+    for i in range(subvencionados.shape[0]):
+        # cuanto se les sube el sueldo:
+        subsidio_maximo = ingreso_min - sueldo_min
+        difference = subvencionados.iloc[i]["INGA_HD"]- sueldo_min
+        valor_af_subs = difference * 0.7101
+
+        subsidio_eff = subsidio_maximo - valor_af_subs
+        # per capita cuanto cambio hará en su hogar
+        difference_pc = subsidio_eff / subvencionados.iloc[i]["NPERSONAS"]
+        # subir el per capita de todos los miembros de la familia
+        subvencionados.at[i,"ING_TOTAL_HOG_HD_PC"]+=difference_pc
+    return(subvencionados)
+
+
+def busca_beneficiados(file,sueldo_min, ingreso_min):
+    """ busca los beneficiados del proyecto del ingreso minimo garantizado
+    """
+    todos = pd.read_csv(file, delimiter=",")
+    todos = pd.DataFrame(todos)
+    #encuentra todos ganando mas que el sueldo min pero menos que ingreso min gar
+    men_ingmin = todos.loc[(todos['INGA_HD'] >= sueldo_min) & (todos['INGA_HD'] <= ingreso_min)]
+    # encuentra trabajadores (entre 18 y 65 años)
+    adultos_ingmin = men_ingmin.loc[(pd.to_numeric(men_ingmin['EDAD']) >= 18) & (pd.to_numeric(men_ingmin['EDAD']) <= 65)]
+
+    print("todos con ingreso mensual entre sumin y ing_min_gar:",men_ingmin.shape)
+    adultos_ingmin = pd.DataFrame(adultos_ingmin).reset_index()
+    #adultos_ingmin['X_POS']=np.nan
+    print("adultos ganando entre sueldo min y ingreso min:",adultos_ingmin.shape)
+
+    # Se calcula cuanto ING_TOTAL_HOG_HD_PC va recibir la familia
+    subvencionados = subvencion_porcentaje(adultos_ingmin, sueldo_min, ingreso_min)
+    # encuentra posicion x del grafico
+    adultos_ingmin["X_POS"]=get_x_pos(folios=adultos_ingmin[["FOLIO"]], expandido= True)
+    # devolver x,y del grafico renovado
+    to_return = adultos_ingmin[["X_POS","ING_TOTAL_HOG_HD_PC"]]
+    no_duplis = to_return.drop_duplicates(subset=["X_POS"])
+    print("Cantidad de Hogares que recibe el bono: ", no_duplis.shape)
+    return no_duplis
+
+def get_x_pos(folios, expandido=True):
+    """ Encuentra la posicion x de familias con folio en folios
+    en nuestro gráfico de familias ordenadas por ingreso per capita
+    expandido es un boolean que indica cual indice eligir
+    el index_exp (de la tabla expandida por fe) o index indice de la tabla
+    ordenada pero no expandida
+    """
+    if expandido:
+        ordered_csv = path + "Encuesta_fams_exp_ord_ab0.csv"
+        in = "index_exp"
+    else:
+        ordered_csv = path + "Base_unida_sorteada2_hog.csv"
+        in = "index"
+
+    ordered = pd.read_csv(ordered_csv, delimiter=",")
+    ordered = pd.DataFrame(ordered,columns=["FOLIO",in])
+    x_pos = []
+    for i in range(folios.shape[0]):
+        folio = folios.loc[i,"FOLIO"]
+        position = ordered.loc[ordered["FOLIO"] == folio, in].values[0]
+        x_pos.append(position)
+    x_pos = pd.Series(x_pos)
+    print("Cantidad de gente que recibe el bono:",x_pos.shape[0])
+    #x_final = x_pos.drop_duplicates(keep='first', inplace=False)
+    #print("Hogares que beneficiarán del subsidio:",x_final.shape[0])
+    return x_pos
