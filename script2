@@ -1,0 +1,110 @@
+import pandas as pd
+import os
+path = os.getcwd()
+
+def augment_fe(file_to_augment,path=path, columns=["index","FOLIO_1","ING_TOTAL_HOG_HD_PC","FE","FE_NP","NPERSONAS"], name_out="Ingpc_nivelChile.csv"):
+    aumentar_datos = pd.read_csv(file_to_augment, delimiter=",")
+    aumentar_datos = pd.DataFrame(aumentar_datos, columns=columns)
+    print(aumentar_datos)
+    # personas esta false porque la multiplicacion ya esta hecha en Encuesta_fams_expandida_ordenada
+    personas=False
+
+    # Get ndArray of all column names
+    columnsNamesArr = aumentar_datos.columns.values
+
+    # Modify a Column Name
+    if columnsNamesArr[1] != 'FOLIO':
+        columnsNamesArr[1] = 'FOLIO'
+        print(aumentar_datos.columns.values)
+    aumentar_datos.set_index("index")
+    #para multiplicar el Fe con el numero de personas
+    if personas:
+        #añado una columna
+        aumentar_datos["FE_NP"] = aumentar_datos[['FE']].multiply(aumentar_datos["NPERSONAS"], axis="index")
+        aumentar_datos.to_csv(path+'Encuesta_fams_FE_NP.csv')
+        print(aumentar_datos)
+
+        #TO DO: **** make FE and FE_NP ints ****
+
+        #FE_NP es el FE multiplicado por el NPERSONAS
+    # round FE and FE_NP to next closest number (5.5 --> 6) and convert to int
+    aumentar_datos["FE"]= aumentar_datos["FE"].round(decimals=0).astype(int)
+    aumentar_datos["FE_NP"] = aumentar_datos["FE_NP"].round(decimals=0).astype(int)
+    print(aumentar_datos)
+    aumentado = aumentar_datos.loc[aumentar_datos.index.repeat(aumentar_datos.FE)]
+    print(aumentado)
+    aumentado.to_csv(path+name_out)
+
+
+
+def rangos_IPC(tabla_gastos, path_save=path):
+    data_ = pd.read_csv(path_save + tabla_gastos, sep=',')
+    data = pd.DataFrame(data_)
+
+    GASTOS_100 = data[data["ING_TOTAL_HOG_HD_PC"] < 100000]
+    GASTOS_100_mean = GASTOS_100.mean(axis=0)
+    print(GASTOS_100_mean)
+    GASTOS_100_mean = pd.DataFrame(GASTOS_100_mean)
+    GASTOS_100_mean.to_csv(path_or_buf=str(path_save + "GASTOS_PC/GASTOS_100_mean"))
+    GASTOS_200 = data[(data["ING_TOTAL_HOG_HD_PC"] < 200000) & (data["ING_TOTAL_HOG_HD_PC"] > 100000)]
+    GASTOS_200 = GASTOS_200.mean(axis=0)
+    print(GASTOS_200)
+    GASTOS_200 = pd.DataFrame(GASTOS_200)
+    GASTOS_200.to_csv(path_or_buf=str(path_save + "GASTOS_PC/GASTOS_200"))
+    GASTOS_300 = data[(data["ING_TOTAL_HOG_HD_PC"] < 300000) & (data["ING_TOTAL_HOG_HD_PC"] > 200000)]
+    GASTOS_300 = GASTOS_300.mean(axis=0)
+    print(GASTOS_300)
+    GASTOS_300 = pd.DataFrame(GASTOS_300)
+    GASTOS_300.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_300")
+    GASTOS_400 = data[(data["ING_TOTAL_HOG_HD_PC"] < 400000) & (data["ING_TOTAL_HOG_HD_PC"] > 300000)]
+    GASTOS_400 = GASTOS_400.mean(axis=0)
+    GASTOS_400 = pd.DataFrame(GASTOS_400)
+    GASTOS_400.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_400")
+    GASTOS_500 = data[(data["ING_TOTAL_HOG_HD_PC"] < 500000) & (data["ING_TOTAL_HOG_HD_PC"] > 400000)]
+    GASTOS_500 = GASTOS_500.mean(axis=0)
+    GASTOS_500 = pd.DataFrame(GASTOS_500)
+    GASTOS_500.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_500")
+    GASTOS_600 = data[(data["ING_TOTAL_HOG_HD_PC"] < 600000) & (data["ING_TOTAL_HOG_HD_PC"] > 500000)]
+    GASTOS_600 = GASTOS_600.mean(axis=0)
+    GASTOS_600 = pd.DataFrame(GASTOS_600)
+    GASTOS_600.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_600")
+    GASTOS_700 = data[(data["ING_TOTAL_HOG_HD_PC"] < 700000) & (data["ING_TOTAL_HOG_HD_PC"] > 600000)]
+    GASTOS_700 = GASTOS_700.mean(axis=0)
+    GASTOS_700 = pd.DataFrame(GASTOS_700)
+    GASTOS_700.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_700")
+    GASTOS_800 = data[(data["ING_TOTAL_HOG_HD_PC"] < 800000) & (data["ING_TOTAL_HOG_HD_PC"] > 700000)]
+    GASTOS_800 = GASTOS_800.mean(axis=0)
+    GASTOS_800 = pd.DataFrame(GASTOS_800)
+    GASTOS_800.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_800")
+    GASTOS_900 = data[(data["ING_TOTAL_HOG_HD_PC"] < 900000) & (data["ING_TOTAL_HOG_HD_PC"] > 800000)]
+    GASTOS_900 = GASTOS_900.mean(axis=0)
+    GASTOS_900 = pd.DataFrame(GASTOS_900)
+    GASTOS_900.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_900")
+    GASTOS_1000 = data[(data["ING_TOTAL_HOG_HD_PC"] < 1000000) & (data["ING_TOTAL_HOG_HD_PC"] > 900000)]
+    GASTOS_1000 = GASTOS_1000.mean(axis=0)
+    GASTOS_1000 = pd.DataFrame(GASTOS_1000)
+    GASTOS_1000.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_1000")
+    GASTOS_1500 = data[(data["ING_TOTAL_HOG_HD_PC"] < 1500000) & (data["ING_TOTAL_HOG_HD_PC"] > 1000000)]
+    GASTOS_1500 = GASTOS_1500.mean(axis=0)
+    GASTOS_1500 = pd.DataFrame(GASTOS_1500)
+    GASTOS_1500.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_1500")
+    GASTOS_2000 = data[(data["ING_TOTAL_HOG_HD_PC"] < 2000000) & (data["ING_TOTAL_HOG_HD_PC"] > 1500000)]
+    GASTOS_2000 = GASTOS_2000.mean(axis=0)
+    GASTOS_2000 = pd.DataFrame(GASTOS_2000)
+    GASTOS_2000.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_2000")
+    GASTOS_3000 = data[(data["ING_TOTAL_HOG_HD_PC"] < 3000000) & (data["ING_TOTAL_HOG_HD_PC"] > 2000000)]
+    GASTOS_3000 = GASTOS_3000.mean(axis=0)
+    GASTOS_3000 = pd.DataFrame(GASTOS_3000)
+    GASTOS_3000.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_3000")
+    GASTOS_5000 = data[(data["ING_TOTAL_HOG_HD_PC"] < 5000000) & (data["ING_TOTAL_HOG_HD_PC"] > 3000000)]
+    GASTOS_5000 = GASTOS_5000.mean(axis=0)
+    GASTOS_5000 = pd.DataFrame(GASTOS_5000)
+    GASTOS_5000.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_5000")
+    GASTOS_10000 = data[(data["ING_TOTAL_HOG_HD_PC"] < 10000000) & (data["ING_TOTAL_HOG_HD_PC"] > 5000000)]
+    GASTOS_10000 = GASTOS_10000.mean(axis=0)
+    GASTOS_10000 = pd.DataFrame(GASTOS_10000)
+    GASTOS_10000.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_10000")
+    GASTOS_30000 = data[(data["ING_TOTAL_HOG_HD_PC"] < 30000000) & (data["ING_TOTAL_HOG_HD_PC"] > 10000000)]
+    GASTOS_30000 = GASTOS_30000.mean(axis=0)
+    GASTOS_30000 = pd.DataFrame(GASTOS_30000)
+    GASTOS_30000.to_csv(path_or_buf=path_save + "GASTOS_PC/GASTOS_30000")
