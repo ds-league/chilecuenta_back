@@ -20,4 +20,4 @@ class PeopleSerializer(serializers.ModelSerializer):
     class Meta:
         model = People
         field = ['folio','inga_hd','fe','persona',
-                 'npersonas','edad','ingreso_hd','ingreso_pc',
+                 'npersonas','edad','ingreso_hd','ingreso_pc']
