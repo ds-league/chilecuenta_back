@@ -49,7 +49,7 @@ class Family(models.Model):
     ptge_gasto   = models.FloatField()
 
 
-class Gastos(models.Model):
+class Expense(models.Model):
     g            = models.CharField(max_length=255)
     c1           = models.FloatField()
     c2           = models.FloatField()
@@ -67,7 +67,7 @@ class Gastos(models.Model):
     ingreso      = models.FloatField() #ing_disp_hog_hd_pc
 
 
-class Personas(models.Model):
+class People(models.Model):
     folio       = models.CharField(max_length=255)
     inga_hd     = models.FloatField()
     fe          = models.FloatField()
