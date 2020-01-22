@@ -25,7 +25,7 @@ SECRET_KEY = '+m@!ed60c5qkw^-l)1sy8sq#ma7z1*k84iu$@czo+a!yp04bap'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0", "ds-league.inf.udec.cl", "152.74.52.24"]
+ALLOWED_HOSTS = ["0.0.0.0", "ds-league.inf.udec.cl", "720a5995f38c"]
 
 
 # Application definition
@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'core',
-    'user',
     'data'
 ]
 
@@ -126,5 +125,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-AUTH_USER_MODEL = 'core.User'
