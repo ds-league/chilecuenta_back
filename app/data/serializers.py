@@ -5,7 +5,7 @@ from core.models import Family, Expense, People  # importing model
 class FamilySerializer(serializers.ModelSerializer):
     class Meta:
         model = Family
-        fields = ['index', 'index_exp', 'folio',  'ingreso',
+        fields = ['id','index', 'index_exp', 'folio',  'ingreso',
                   'fe', 'np', 'gasto',  'ingreso_disp', 'ptge_gasto']
 
 
@@ -20,5 +20,5 @@ class ExpenseSerializer(serializers.ModelSerializer):
 class PeopleSerializer(serializers.ModelSerializer):
     class Meta:
         model  = People
-        fields = ['folio', 'inga_hd', 'fe', 'persona',
+        fields = ['id','folio', 'inga_hd', 'fe', 'persona',
                  'npersonas', 'edad', 'ingreso_hd', 'ingreso_pc']
